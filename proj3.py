@@ -1,6 +1,7 @@
 import tkinter as tk
 import util
-
+import cv2
+from PIL import Image, ImageTk
 class App:
     def __init__(self):
         self.main_window = tk.Tk()
@@ -31,7 +32,20 @@ class App:
         print("Register clicked")
 
     def add_webcam(self, label):
-        pass
+        if 'cap' not in self.__dict__:
+            self.cap = cv2.VideoCapture(0)
+        self._label = label
+        self.process_webcam()
+    
+    def process_webcam(self):
+        ret, frame = self.cap.read()
+        self.most_recent_capture_arr = frame
+        img_ = cv2.cvtColor(self.most_recent_capture_arr, cv2.COLOR_BGR2RGB)
+        self.most_recent_capture_pil = Image.fromarray(img_)
+        imgtk = ImageTk.PhotoImage(image=self.most_recent_capture_pil)
+        self._label.imgtk = imgtk
+        self._label.configure(image=imgtk)
+        self._label.after(20, self.process_webcam())
 if __name__ == "__main__":
     app = App()
     app.start()
